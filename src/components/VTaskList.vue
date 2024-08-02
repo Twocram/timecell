@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { UserTask } from '@/@types/task'; 
+import type { UserTask } from '@/@types/task.d.ts'; 
 import VTask from './VTask.vue';
 
 defineProps<{

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import VCreateTaskDialog from '@/components/dialogs/VCreateTaskDialog.vue'
-import type { UserTask } from './@types/task'
+import type { UserTask } from '@/@types/task.d.ts';
 import VTaskList from './components/VTaskList.vue';
 
 const rows = ref<string[]>(['09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19'])

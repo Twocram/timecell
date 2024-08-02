@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { ComboboxOption } from '@/@types/task';
+import type { ComboboxOption } from '@/@types/task.d.ts';
 import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{

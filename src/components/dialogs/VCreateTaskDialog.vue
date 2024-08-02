@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, onBeforeUnmount, onMounted } from 'vue'
-import { type ComboboxOption, type UserTask } from '@/@types/task';
+import type { ComboboxOption, UserTask } from '@/@types/task.d.ts';
 import VCombobox from '../ui/VCombobox.vue';
 
 const emits = defineEmits(['close', 'create', 'closeWithoutSave'])
