@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue'
 import VCreateTaskDialog from '@/components/dialogs/VCreateTaskDialog.vue'
 import type { UserTask } from '@/@types/task.d.ts';
 import VTaskList from './components/VTaskList.vue';
@@ -13,11 +13,17 @@ const tasks = ref<UserTask[]>([])
 
 onMounted(() => {
   telegram.enableClosingConfirmation()
+  window.addEventListener('mouseup', handlePointerUp)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('mouseup', handlePointerUp)
 })
 
 const isCreateTaskDialogVisible = ref<boolean>(false)
 const selectedBlocks = ref<string[]>([])
 const currentTaskColor = ref<string>('grey')
+const previousTaskColor = ref<string>('')
 
 const blocksCount = computed<string[]>(() => {
   const result = []
@@ -83,46 +89,36 @@ const selectBlocksInRange = (start: string, end: string) => {
 
   const startIndex = rows.value.indexOf(startCoords.row)
   const endIndex = rows.value.indexOf(endCoords.row)
-  const minRow = Math.min(startIndex, endIndex)
-  const maxRow = Math.max(startIndex, endIndex)
 
+  if (startIndex !== endIndex) {
+    return
+  }
+
+  const rowIndex = startIndex
   const startColIndex = columns.value.indexOf(startCoords.col)
   const endColIndex = columns.value.indexOf(endCoords.col)
   const minCol = Math.min(startColIndex, endColIndex)
   const maxCol = Math.max(startColIndex, endColIndex)
 
-
-  if (startIndex <= endIndex) {
-    for (let i = minRow; i <= maxRow; i++) {
-      for (
-        let j = i === minRow ? minCol : 0;
-        j <= (i === maxRow ? maxCol : columns.value.length - 1);
-        j++
-      ) {
-        activeBlocks.value.set(`${rows.value[i]}:${columns.value[j]}`, currentTaskColor.value)
-      }
-    }
-  } else {
-    for (let i = maxRow; i >= minRow; i--) {
-      for (
-        let j = i === maxRow ? maxCol : columns.value.length - 1;
-        j >= (i === minRow ? minCol : 0);
-        j--
-      ) {
-        activeBlocks.value.set(`${rows.value[i]}:${columns.value[j]}`, currentTaskColor.value)
-      }
-    } 
+  for (let j = minCol; j <= maxCol; j++) {
+    activeBlocks.value.set(`${rows.value[rowIndex]}:${columns.value[j]}`, currentTaskColor.value)
   }
 }
 
 const handleMouseUp = () => {
-  const activeBlocksArray = Array.from(activeBlocks.value.keys())
-  if (activeBlocksArray.length > 1) {
-    selectedBlocks.value = activeBlocksArray.sort((a, b) => a.localeCompare(b))
-  } else {
-    selectedBlocks.value = activeBlocksArray
-  }
-
+  selectedBlocks.value = Array.from(
+    activeBlocks.value.keys()
+  ).filter(block => activeBlocks.value.get(block) === currentTaskColor.value)
+    .sort((a, b) => {
+      const [aRow, aCol] = a.split(':')
+      const [bRow, bCol] = b.split(':')
+      if (aRow === bRow) {
+        return Number(aCol) - Number(bCol)
+      } else {
+        return Number(aRow) - Number(bRow)
+      }
+    }
+    )
   isCreateTaskDialogVisible.value = true
 }
 
@@ -132,6 +128,13 @@ const closeTaskDialog = () => {
 
 const closeTaskDialogWithoutSave = () => {
   isCreateTaskDialogVisible.value = false
+
+  activeBlocks.value.forEach((value, key) => {
+    if (value === previousTaskColor.value) {
+      activeBlocks.value.delete(key)
+    }
+  })
+  selectedBlocks.value = []
 }
 
 const addRow = () => {
@@ -140,7 +143,7 @@ const addRow = () => {
 }
 
 const createTaskHandler = (task: UserTask) => {
-  task.color = currentTaskColor.value // Assign a unique color to each task
+  task.color = currentTaskColor.value
   tasks.value.push(task)
 
   isCreateTaskDialogVisible.value = false
@@ -170,22 +173,17 @@ updateActiveBlocks()
 
 watch(isCreateTaskDialogVisible, (newValue) => {
   if (newValue) {
-    currentTaskColor.value = generateColor();
+    previousTaskColor.value = currentTaskColor.value
+    currentTaskColor.value = generateColor()
   }
 })
-
 </script>
 
 <template>
-  <VCreateTaskDialog
-    v-if="isCreateTaskDialogVisible"
-    :picked-time="selectedBlocks"
-    @create="createTaskHandler($event)"
-    @close="closeTaskDialog"
-    @close-without-save="closeTaskDialogWithoutSave"
-  />
+  <VCreateTaskDialog v-if="isCreateTaskDialogVisible" :picked-time="selectedBlocks" @create="createTaskHandler($event)"
+    @close="closeTaskDialog" @close-without-save="closeTaskDialogWithoutSave" />
   <div class="main-container">
-    <div class="container" @pointerup="handlePointerUp" @touchend="handleTouchEnd">
+    <div class="container" @touchend="handleTouchEnd">
       <div class="minutes-wrapper">
         <div class="minutes" v-for="column in columns" :key="column">
           {{ column }}
@@ -196,21 +194,11 @@ watch(isCreateTaskDialogVisible, (newValue) => {
         <div class="hours" v-for="(row, index) in rows" :key="index">{{ row }}</div>
       </div>
 
-      <div
-        class="blocks-wrapper"
-        :style="{ gridTemplateColumns: `repeat(${columns.length}, 28px)` }"
-      >
-        <div
-          v-for="block in blocksCount"
-          class="blocks"
-          :data-tip="block"
-          :key="block"
-          :style="{ backgroundColor: activeBlocks.get(block) || 'black' }"
-          @pointerdown="handlePointerDown(block)"
-          @pointerenter="handlePointerEnter(block)"
-          @touchstart="handleTouchStart($event, block)"
-          @touchmove="handleTouchMove"
-        />
+      <div class="blocks-wrapper" :style="{ gridTemplateColumns: `repeat(${columns.length}, 28px)` }">
+        <div v-for="block in blocksCount" class="blocks" :data-tip="block" :key="block"
+          :style="{ backgroundColor: activeBlocks.get(block) || 'black' }" @pointerdown="handlePointerDown(block)"
+          @pointerenter="handlePointerEnter(block)" @touchstart="handleTouchStart($event, block)"
+          @touchmove="handleTouchMove" />
       </div>
     </div>
     <button class="row-btn" @click="addRow">Add row</button>
