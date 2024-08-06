@@ -117,8 +117,57 @@ const handleMouseUp = () => {
       } else {
         return Number(aRow) - Number(bRow)
       }
+    })
+
+  if (selectedBlocks.value.length === 1) {
+    const singleBlock = selectedBlocks.value[0]
+    const [row, col] = singleBlock.split(':')
+    let nextColIndex = columns.value.indexOf(col) + 1
+    let nextRowIndex = rows.value.indexOf(row)
+
+    if (nextColIndex >= columns.value.length) {
+      nextColIndex = 0
+      nextRowIndex += 1
     }
-    )
+
+    let nextBlock
+    if (nextRowIndex < rows.value.length) {
+      nextBlock = `${rows.value[nextRowIndex]}:${columns.value[nextColIndex]}`
+    } else {
+      let newHour = Number(row)
+      let newMinute = Number(col)
+      if (newMinute >= 50) {
+        newMinute = 0
+        newHour += 1
+      } else {
+        newMinute += 10
+      }
+      nextBlock = `${String(newHour).padStart(2, '0')}:${String(newMinute).padStart(2, '0')}`
+    }
+    selectedBlocks.value.push(nextBlock)
+  } else {
+    let [lastRow, lastCol] = selectedBlocks.value[selectedBlocks.value.length - 1].split(':')
+    let lastColIndex = columns.value.indexOf(lastCol)
+    lastColIndex += 1
+    if (lastColIndex >= columns.value.length) {
+      lastColIndex = 0
+      lastRow = String(Number(lastRow) + 1).padStart(2, '0')
+    }
+    if (rows.value.indexOf(lastRow) < rows.value.length) {
+      selectedBlocks.value[selectedBlocks.value.length - 1] = `${lastRow}:${columns.value[lastColIndex]}`
+    } else {
+      let newHour = Number(lastRow)
+      let newMinute = Number(columns.value[lastColIndex])
+      if (newMinute >= 50) {
+        newMinute = 0
+        newHour += 1
+      } else {
+        newMinute += 10
+      }
+      selectedBlocks.value[selectedBlocks.value.length - 1] = `${String(newHour).padStart(2, '0')}:${String(newMinute).padStart(2, '0')}`
+    }
+  }
+
   isCreateTaskDialogVisible.value = true
 }
 
@@ -139,7 +188,7 @@ const closeTaskDialogWithoutSave = () => {
 
 const addRow = () => {
   if (rows.value[rows.value.length - 1] === String(23)) return
-  rows.value.push(String(Number(rows.value[rows.value.length - 1]) + 1))
+  rows.value.push(String(Number(rows.value[rows.value.length - 1]) + 1).padStart(2, '0'))
 }
 
 const createTaskHandler = (task: UserTask) => {
