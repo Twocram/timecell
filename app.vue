@@ -53,6 +53,8 @@ onMounted(async () => {
   window.addEventListener('mouseup', handlePointerUp)
 
   responseTasks.value = await getTasks()
+
+  console.log("CURRENT TIME: ", currentTime.value)
 })
 
 onBeforeUnmount(() => {
