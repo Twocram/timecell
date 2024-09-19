@@ -144,33 +144,26 @@ const selectBlocksInRange = (start: string, end: string) => {
   }
 }
 
-const formatBlock = (row: number, col: number) => `${String(row).padStart(2, '0')}:${String(col).padStart(2, '0')}`;
-
-const adjustTime = (hour: number, minute: number) => {
-  if (minute >= 50) {
-    minute = 0;
-    hour++;
-  } else {
-    minute += 10;
-  }
-  return formatBlock(hour, minute);
+const formatBlock = (hour: number, minute: number) => {
+  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 };
 
-
 const getNextBlock = (row: number, col: number) => {
-  let nextColIndex = columns.value.indexOf(String(col)) + 1;
-  let nextRowIndex = rows.value.indexOf(String(row));
+  let currentHour = Number(row);
+  let currentMinute = Number(col);
 
-  if (nextColIndex >= columns.value.length) {
-    nextColIndex = 0;
-    nextRowIndex++;
-  }
-
-  if (nextRowIndex < rows.value.length) {
-    return `${rows.value[nextRowIndex]}:${columns.value[nextColIndex]}`;
+  if (currentMinute < 50) {
+    currentMinute += 10;
   } else {
-    return adjustTime(row, col);
+    currentMinute = 0;
+    currentHour += 1;
+
+    if (currentHour >= 24) {
+      currentHour = 0;
+    }
   }
+
+  return formatBlock(currentHour, currentMinute);
 };
 
 const handleMouseUp = () => {
@@ -188,9 +181,16 @@ const handleMouseUp = () => {
     selectedBlocks.value.push(getNextBlock(row, col));
   } else {
     let [lastRow, lastCol] = parseBlock(selectedBlocks.value[selectedBlocks.value.length - 1]);
-    selectedBlocks.value[selectedBlocks.value.length - 1] = getNextBlock(lastRow, lastCol);
-  }
+    if (lastCol > 40) {
+      lastCol = 0;
+      lastRow += 1;
 
+      if (lastRow >= 24) {
+        lastRow = 0;
+      }
+    }
+    selectedBlocks.value[selectedBlocks.value.length - 1] = formatBlock(lastRow, lastCol);
+  }
   isCreateTaskDialogVisible.value = true;
 };
 
@@ -239,8 +239,8 @@ updateActiveBlocks()
 </script>
 
 <template>
-  <VCreateTaskDialog v-if="isCreateTaskDialogVisible" :picked-time="selectedBlocks" @create="createTaskHandler($event)"
-    @close="closeTaskDialog" @close-without-save="closeTaskDialogWithoutSave" />
+  <VCreateTaskDialog v-if="isCreateTaskDialogVisible" :tasks="responseTasks" :picked-time="selectedBlocks"
+    @create="createTaskHandler($event)" @close="closeTaskDialog" @close-without-save="closeTaskDialogWithoutSave" />
   <div class="main-container">
     <div class="container" @touchend="handleTouchEnd">
       <div class="minutes-wrapper">

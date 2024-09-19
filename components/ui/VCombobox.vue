@@ -5,7 +5,7 @@
         <div class="combobox-options" v-if="isFocused">
             <div class="combobox-option" v-if="!filteredOptions.length">No options</div>
             <div class="combobox-option" v-for="option in filteredOptions" :key="option.value"
-                :class="{ 'selected': option.value === modelValue }" @click="selectOption(option)">
+                :class="{ 'selected': option.value === selectedOption }" @click="selectOption(option)">
                 {{ option.label }}
             </div>
         </div>

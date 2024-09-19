@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, onBeforeUnmount, onMounted } from 'vue'
-import type { ComboboxOption, UserTask } from '../../types/task';
+import type { ComboboxOption, Task, UserTask } from '../../types/task';
 import VCombobox from '../ui/VCombobox.vue';
 
 const emits = defineEmits(['close', 'create', 'closeWithoutSave'])
 
 const props = defineProps<{
-    pickedTime: string[]
+    pickedTime: string[],
+    tasks: Task[],
 }>()
 
 const summaryText = ref<string>('')
@@ -34,22 +35,14 @@ const optionsModel = ref<string>('')
 
 const color = ref<string>('')
 
-const options = ref<ComboboxOption[]>([
-    {
-        label: 'Raffkers fix land',
-        value: 'Raffkers fix land'
-    },
-
-    {
-        label: 'Shopot fix upload',
-        value: 'Shopot fix upload'
-    },
-
-    {
-        label: 'Shopot feat telegram bot',
-        value: 'Shopot feat telegram bot'
-    }
-])
+const options = computed<ComboboxOption[]>(() => {
+    return props.tasks.map((task) => {
+        return {
+            label: task.name,
+            value: task.name,
+        }
+    })
+})
 
 const createHandler = (): void => {
     const output: UserTask = {
