@@ -21,6 +21,7 @@ export async function createTask(task: UserTask) {
       headers: {
         "Content-Type": "application/json",
       },
+      method: "POST",
       body: JSON.stringify({
         title: task.option,
         time: task.selectedTime,
