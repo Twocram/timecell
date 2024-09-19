@@ -3,7 +3,7 @@ import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue'
 import VCreateTaskDialog from './components/dialogs/VCreateTaskDialog.vue'
 import type { Task, UserTask } from './types/task';
 import VTaskList from './components/VTaskList.vue';
-import { getTasks, createTask } from './api/task';
+import { getTasks, createTask } from './scripts/task';
 
 useHead({
   title: 'TimeCell',
