@@ -46,9 +46,10 @@ const currentTime = computed(() => {
 })
 
 onMounted(async () => {
-  const telegram = Telegram.WebApp
-
-  telegram.enableClosingConfirmation()
+  if (import.meta.client && typeof Telegram !== 'undefined') {
+    const telegram = Telegram.WebApp;
+    telegram.enableClosingConfirmation();
+  }
 
   window.addEventListener('mouseup', handlePointerUp)
 
