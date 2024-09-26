@@ -12,6 +12,8 @@ const props = defineProps<{
 
 const summaryText = ref<string>('')
 
+const isLoading = ref<boolean>(false)
+
 const handleKeydown = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
         emits('closeWithoutSave')
@@ -33,7 +35,7 @@ const selectedTime = computed<string>(() => {
 
 const optionsModel = ref<string>('')
 
-const color = ref<string>('')
+const color = ref<string>('#000000')
 
 const options = computed<ComboboxOption[]>(() => {
     return props.tasks.map((task) => {
@@ -45,12 +47,17 @@ const options = computed<ComboboxOption[]>(() => {
 })
 
 const createHandler = (): void => {
+    if (isLoading.value) return;
+
+    isLoading.value = true;
+
     const output: UserTask = {
         time: props.pickedTime,
         summary: summaryText.value,
         selectedTime: selectedTime.value,
         color: color.value,
-        option: optionsModel.value
+        option: optionsModel.value,
+        pickedTime: props.pickedTime
     }
 
     emits('create', output)
@@ -86,7 +93,16 @@ onBeforeUnmount(() => {
                     rows="10"></textarea>
             </div>
 
-            <button class="save-btn" @click="createHandler">Create</button>
+            <button :aria-disabled="isLoading" :class="{ 'disabled': isLoading }" class="save-btn"
+                @click="createHandler">
+                <template v-if="isLoading">
+                    <div class="lds-dual-ring"></div>
+                </template>
+
+                <template v-else>
+                    Create
+                </template>
+            </button>
         </div>
     </div>
 </template>
@@ -140,6 +156,10 @@ onBeforeUnmount(() => {
     font-size: 16px;
 }
 
+.save-btn.disabled {
+    cursor: not-allowed;
+}
+
 .save-btn:hover {
     background: grey;
     color: white;
@@ -162,5 +182,39 @@ onBeforeUnmount(() => {
 
 .time-container {
     margin-top: 4px;
+}
+
+
+.lds-dual-ring,
+.lds-dual-ring:after {
+    box-sizing: border-box;
+}
+
+.lds-dual-ring {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+}
+
+.lds-dual-ring:after {
+    content: " ";
+    display: block;
+    width: 24px;
+    height: 24px;
+    margin-top: 2px;
+    border-radius: 50%;
+    border: 3.4px solid currentColor;
+    border-color: currentColor transparent currentColor transparent;
+    animation: lds-dual-ring 1.2s linear infinite;
+}
+
+@keyframes lds-dual-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 </style>

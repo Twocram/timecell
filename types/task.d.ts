@@ -4,6 +4,7 @@ export type UserTask = {
   color: string;
   selectedTime: string;
   option: string;
+  pickedTime: string[];
 };
 
 export type Task = {
@@ -12,6 +13,7 @@ export type Task = {
   time: string;
   summary: string;
   color: string;
+  pickedTime: string;
 };
 
 export type ComboboxOption = {

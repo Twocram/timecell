@@ -1,11 +1,14 @@
 import { Client } from "@notionhq/client";
 
 export default defineEventHandler(async (event) => {
-  const { title, time, summary, color } = (await readBody(event)) as {
+  const { title, time, summary, color, pickedTime } = (await readBody(
+    event
+  )) as {
     title: string;
     time: string;
     summary: string;
     color: string;
+    pickedTime: string[];
   };
 
   const config = useRuntimeConfig();
@@ -59,6 +62,18 @@ export default defineEventHandler(async (event) => {
             type: "text",
             text: {
               content: color,
+            },
+          },
+        ],
+      },
+
+      "Picked Time": {
+        type: "rich_text",
+        rich_text: [
+          {
+            type: "text",
+            text: {
+              content: pickedTime.toString(),
             },
           },
         ],

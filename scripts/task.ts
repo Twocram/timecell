@@ -27,6 +27,7 @@ export async function createTask(task: UserTask) {
         time: task.selectedTime,
         summary: task.summary,
         color: task.color,
+        pickedTime: task.pickedTime,
       }),
     });
   } catch (error) {

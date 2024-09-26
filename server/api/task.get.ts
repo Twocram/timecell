@@ -17,22 +17,26 @@ export default defineEventHandler(async () => {
     time: string;
     summary: string;
     color: string;
+    pickedTime: string[];
   }[] = [];
 
   for (const page of databaseList.results) {
     result.push({
       id: page.id,
       // @ts-ignore
-      name: page.properties.Name.title[0].plain_text,
+      name: page.properties["Name"].title[0].plain_text,
       // @ts-ignore
 
-      time: page.properties.Time.rich_text[0].plain_text,
+      time: page.properties["Time"].rich_text[0].plain_text,
       // @ts-ignore
 
-      summary: page.properties.Summary.rich_text[0].plain_text,
+      summary: page.properties["Summary"].rich_text[0].plain_text,
       // @ts-ignore
 
-      color: page.properties.Color.rich_text[0].plain_text,
+      color: page.properties["Color"].rich_text[0].plain_text,
+
+      // @ts-ignore
+      pickedTime: page.properties["Picked Time"].rich_text[0].plain_text,
     });
   }
 

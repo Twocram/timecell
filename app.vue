@@ -189,7 +189,7 @@ const handleMouseUp = () => {
         lastRow = 0;
       }
     }
-    selectedBlocks.value[selectedBlocks.value.length - 1] = formatBlock(lastRow, lastCol);
+    selectedBlocks.value.push(formatBlock(lastRow, lastCol));
   }
   isCreateTaskDialogVisible.value = true;
 };
@@ -233,6 +233,20 @@ const updateActiveBlocks = () => {
   })
 }
 
+const isPicked = (block: string): string => {
+  for (const task of responseTasks.value) {
+    const pickedTimeArray = task.pickedTime.split(',')
+
+    for (const pickedTimeItem of pickedTimeArray) {
+      if (pickedTimeItem === block) {
+        return task.color
+      }
+    }
+  }
+
+  return 'black';
+}
+
 watch(tasks, updateActiveBlocks)
 
 updateActiveBlocks()
@@ -255,10 +269,11 @@ updateActiveBlocks()
 
       <div class="blocks-wrapper" :style="{ gridTemplateColumns: `repeat(${columns.length}, 28px)` }">
         <div v-for="block in blocksCount" class="block" :data-tip="block" :key="block"
-          :style="[{ backgroundColor: activeBlocks.get(block) || 'black' }]"
+          :style="[{ backgroundColor: activeBlocks.get(block) || isPicked(block) }]"
           :class="[{ 'current-time': block === currentTime }, { 'picked-block': activeBlocks.has(block) && isSelecting }]"
           @pointerdown="handlePointerDown(block)" @pointerenter="handlePointerEnter(block)"
-          @touchstart="handleTouchStart($event, block)" @touchmove="handleTouchMove" />
+          @touchstart="handleTouchStart($event, block)" @touchmove="handleTouchMove">
+        </div>
       </div>
     </div>
     <button class="row-btn" @click="addRow">Add row</button>
@@ -316,6 +331,7 @@ updateActiveBlocks()
   height: 100%;
   width: 100%;
   user-select: none;
+  border: 1px solid black;
   background: black;
   border-radius: 4px;
   cursor: pointer;
