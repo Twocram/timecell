@@ -39,13 +39,37 @@ const tasks = ref<UserTask[]>([])
 
 const responseTasks = ref<Task[]>([])
 
-const currentTime = computed(() => {
+const currentTime = ref<string>('')
+
+let interval: NodeJS.Timeout | number | null = null;
+
+const setCurrentTime = () => {
   const time = new Date();
 
-  return `${time.getHours()}:${Math.round(time.getMinutes() / 10) * 10 === 0 ? '00' : Math.round(time.getMinutes() / 10) * 10}`
-})
+  let hours = time.getHours();
+
+  const minutes = () => {
+    if (Math.round(time.getMinutes() / 10) * 10 === 0) {
+      return '00'
+    } else if (Math.round(time.getMinutes() / 10) * 10 === 60) {
+      hours += 1
+      return '00'
+    } else {
+      return Math.round(time.getMinutes() / 10) * 10
+    }
+  }
+
+  currentTime.value = `${hours}:${minutes()}`
+}
 
 onMounted(async () => {
+
+  setCurrentTime()
+
+  interval = setInterval(() => {
+    setCurrentTime()
+  }, 1000 * 60)
+
   if (import.meta.client && typeof Telegram !== 'undefined') {
     const telegram = Telegram.WebApp;
     telegram.enableClosingConfirmation();
@@ -58,6 +82,9 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('mouseup', handlePointerUp)
+  if (interval !== null) {
+    clearInterval(interval)
+  }
 })
 
 const isCreateTaskDialogVisible = ref<boolean>(false)
