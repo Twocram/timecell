@@ -15,6 +15,22 @@ export default defineEventHandler(async (event) => {
 
   const notion = new Client({ auth: config.apiKey });
 
+  const tasksWithSameName = await notion.databases.query({
+    database_id: config.databaseId as string,
+    filter: {
+      property: "Name",
+      title: {
+        equals: title,
+      },
+    },
+  });
+
+  let sameTask: any = {};
+
+  if (tasksWithSameName.results.length > 0) {
+    sameTask = tasksWithSameName.results[0];
+  }
+
   await notion.pages.create({
     parent: {
       database_id: config.databaseId as string,
@@ -61,7 +77,9 @@ export default defineEventHandler(async (event) => {
           {
             type: "text",
             text: {
-              content: color,
+              content: sameTask?.properties
+                ? sameTask.properties.Color.rich_text[0].plain_text
+                : color,
             },
           },
         ],
