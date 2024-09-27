@@ -5,6 +5,7 @@ export type UserTask = {
   selectedTime: string;
   option: string;
   pickedTime: string[];
+  telegramId: number,
 };
 
 export type Task = {
@@ -14,6 +15,7 @@ export type Task = {
   summary: string;
   color: string;
   pickedTime: string;
+  telegramId: string;
 };
 
 export type ComboboxOption = {

@@ -1,7 +1,13 @@
 import { Client } from "@notionhq/client";
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
+
+  const headers = getRequestHeaders(event);
+
+  const authorizationHeader = headers["authorization"];
+
+  const telegramId = authorizationHeader?.replace("Bearer ", "");
 
   const apiKey = config.apiKey;
 
@@ -9,6 +15,12 @@ export default defineEventHandler(async () => {
 
   const databaseList = await notion.databases.query({
     database_id: process.env.NOTION_DATABASE_ID as string,
+    filter: {
+      property: "telegram_id",
+      rich_text: {
+        equals: telegramId as string,
+      },
+    }
   });
 
   const result: {
@@ -18,6 +30,7 @@ export default defineEventHandler(async () => {
     summary: string;
     color: string;
     pickedTime: string[];
+    telegramId: string;
   }[] = [];
 
   for (const page of databaseList.results) {
@@ -37,6 +50,9 @@ export default defineEventHandler(async () => {
 
       // @ts-ignore
       pickedTime: page.properties["Picked Time"].rich_text[0].plain_text,
+
+      // @ts-ignore
+      telegramId: page.properties["telegram_id"].rich_text[0].plain_text,
     });
   }
 

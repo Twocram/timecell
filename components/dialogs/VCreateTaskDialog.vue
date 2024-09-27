@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onBeforeUnmount, onMounted } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import type { ComboboxOption, Task, UserTask } from '../../types/task';
 import VCombobox from '../ui/VCombobox.vue';
 
@@ -9,6 +9,8 @@ const props = defineProps<{
     pickedTime: string[],
     tasks: Task[],
 }>()
+
+const telegramId = ref<number | null>(null)
 
 const summaryText = ref<string>('')
 
@@ -21,6 +23,8 @@ const handleKeydown = (event: KeyboardEvent) => {
 }
 
 onMounted(() => {
+    const telegram = useTelegram()
+    telegramId.value = telegram.getUserId()
     document.body.classList.add('overflow')
     document.addEventListener('keydown', handleKeydown)
 })
@@ -57,7 +61,8 @@ const createHandler = (): void => {
         selectedTime: selectedTime.value,
         color: color.value,
         option: optionsModel.value,
-        pickedTime: props.pickedTime
+        pickedTime: props.pickedTime,
+        telegramId: telegramId.value || 0
     }
 
     emits('create', output)

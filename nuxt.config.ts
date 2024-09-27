@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   devtools: { enabled: true },
-  ssr: false,
+  ssr: true,
   css: ["~/assets/main.css"],
   plugins: ["~/plugins/directives.ts"],
   runtimeConfig: {

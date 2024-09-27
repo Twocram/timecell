@@ -1,16 +1,18 @@
 import type { Task, UserTask } from "~/types/task";
 
-export async function getTasks(): Promise<Task[]> {
+export async function getTasks(telegramId: number): Promise<Task[]> {
   try {
     const response = await $fetch("/api/task", {
       method: "get",
+      headers: {
+        'authorization': `Bearer ${telegramId}`,
+      }
     });
 
-    const data = response as Task[];
+    const data = response as unknown as Task[];
 
     return data;
   } catch (err) {
-    console.log(err);
     return [];
   }
 }
@@ -28,6 +30,7 @@ export async function createTask(task: UserTask) {
         summary: task.summary,
         color: task.color,
         pickedTime: task.pickedTime,
+        telegramId: task.telegramId,
       }),
     });
   } catch (error) {
