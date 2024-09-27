@@ -42,12 +42,18 @@ const optionsModel = ref<string>('')
 const color = ref<string>('#000000')
 
 const options = computed<ComboboxOption[]>(() => {
-    return props.tasks.map((task) => {
+    const _options = props.tasks.map((task) => {
         return {
             label: task.name,
             value: task.name,
         }
     })
+
+    const uniqueOptions = [
+        ...new Map(_options.map(item => [item.label, item])).values()
+    ];
+
+    return uniqueOptions
 })
 
 const createHandler = (): void => {
