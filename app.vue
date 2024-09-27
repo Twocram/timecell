@@ -231,6 +231,7 @@ const handleMouseUp = () => {
     selectedBlocks.value.push(formatBlock(lastRow, lastCol));
   }
   isCreateTaskDialogVisible.value = true;
+  activeBlocks.value = new Map();
 };
 
 const closeTaskDialog = () => {
