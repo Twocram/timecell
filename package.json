@@ -12,7 +12,6 @@
   "dependencies": {
     "@notionhq/client": "^2.2.15",
     "click-outside-vue3": "^4.0.1",
-    "grammy": "^1.30.0",
     "nuxt": "^3.13.0",
     "vue": "latest",
     "vue-router": "latest"
