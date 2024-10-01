@@ -92,9 +92,7 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="color-container">
-                <div class="caption-sub">Color: {{ color }}</div>
-
-                <input type="color" v-model="color" />
+                <div class="caption-sub">Color: <input type="color" v-model="color" /></div>
             </div>
 
             <div class="summary-container">
@@ -160,8 +158,9 @@ onBeforeUnmount(() => {
     margin-top: 14px;
     width: 100%;
     height: 40px;
-    background: none;
-    border: 1px solid grey;
+    background: black;
+    color: white;
+    border: 1px solid black;    
     border-radius: 4px;
     font-family: 'Montserrat', sans-serif;
     font-size: 16px;
@@ -172,7 +171,8 @@ onBeforeUnmount(() => {
 }
 
 .save-btn:hover {
-    background: grey;
+    border: 1px solid gray;    
+    background: gray;
     color: white;
     transition: 0.3s;
 }
