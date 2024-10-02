@@ -2,8 +2,9 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import VCreateTaskDialog from "./components/dialogs/VCreateTaskDialog.vue";
 import VTaskList from "./components/VTaskList.vue";
-import { createTask, getTasks } from "./scripts/task";
+import { createTask, getTasks } from "~/services/taskService";
 import type { Task, UserTask } from "./types/task";
+import {createReport} from "~/services/reportService";
 
 useHead({
   title: "TimeCell",
@@ -287,6 +288,10 @@ const isPicked = (block: string): string => {
   return "black";
 };
 
+async function createReportHandler() {
+  await createReport(responseTasks.value)
+}
+
 watch(tasks, updateActiveBlocks);
 
 updateActiveBlocks();
@@ -342,6 +347,7 @@ updateActiveBlocks();
       </div>
     </div>
     <button class="row-btn" @click="addRow">Add row</button>
+    <button class="row-btn" style="margin-top: 18px" @click="createReportHandler" v-if="responseTasks.length">Send Report</button>
 
     <VTaskList v-if="responseTasks.length" :tasks="responseTasks" />
   </div>

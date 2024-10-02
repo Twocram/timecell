@@ -1,4 +1,4 @@
-import type { Task, UserTask } from "~/types/task";
+import type {Task, UserTask} from "~/types/task";
 
 export async function getTasks(telegramId: number): Promise<Task[]> {
   try {
@@ -9,9 +9,7 @@ export async function getTasks(telegramId: number): Promise<Task[]> {
       }
     });
 
-    const data = response as unknown as Task[];
-
-    return data;
+    return response as unknown as Task[];
   } catch (err) {
     return [];
   }

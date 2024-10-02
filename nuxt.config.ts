@@ -9,5 +9,7 @@ export default defineNuxtConfig({
     apiKey: process.env.NOTION_API_KEY || "",
     pageId: process.env.NOTION_PAGE_ID || "",
     databaseId: process.env.NOTION_DATABASE_ID || "",
+    botToken: process.env.TELEGRAM_BOT_TOKEN || "",
+    groupChatId: process.env.GROUP_CHAT_ID || "",
   },
 });
