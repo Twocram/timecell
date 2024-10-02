@@ -57,7 +57,7 @@ const options = computed<ComboboxOption[]>(() => {
 })
 
 const createHandler = (): void => {
-    if (isLoading.value) return;
+    if (isLoading.value || !optionsModel.value) return;
 
     isLoading.value = true;
 
@@ -102,7 +102,7 @@ onBeforeUnmount(() => {
                     rows="10"></textarea>
             </div>
 
-            <button :aria-disabled="isLoading" :class="{ 'disabled': isLoading }" class="save-btn"
+            <button :aria-disabled="isLoading || !optionsModel" :class="{ 'disabled': isLoading || !optionsModel }" class="save-btn"
                 @click="createHandler">
                 <template v-if="isLoading">
                     <div class="lds-dual-ring"></div>
