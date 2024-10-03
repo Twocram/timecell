@@ -16,11 +16,31 @@ export default defineEventHandler(async (event) => {
   const databaseList = await notion.databases.query({
     database_id: process.env.NOTION_DATABASE_ID as string,
     filter: {
-      property: "telegram_id",
-      rich_text: {
-        equals: telegramId as string,
-      },
-    }
+      and: [
+        {
+          property: "telegram_id",
+          rich_text: {
+            equals: telegramId as string,
+          },
+        },
+        {
+          or: [
+            {
+              property: "Status",
+              status: {
+                equals: "Not Started",
+              },
+            },
+            {
+              property: "Status",
+              status: {
+                equals: "In progress",
+              },
+            },
+          ],
+        },
+      ],
+    },
   });
 
   const result: {
