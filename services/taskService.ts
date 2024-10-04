@@ -1,11 +1,11 @@
-import type {Task, UserTask} from "~/types/task";
+import type { Task, UserTask } from "~/types/task";
 
-export async function getTasks(telegramId: number): Promise<Task[]> {
+export async function getTasks(telegramUsername: string): Promise<Task[]> {
   try {
     const response = await $fetch("/api/task", {
       method: "get",
       headers: {
-        'authorization': `Bearer ${telegramId}`,
+        'authorization': `Bearer ${telegramUsername}`,
       }
     });
 

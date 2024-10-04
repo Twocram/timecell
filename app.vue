@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { createReport } from "~/services/reportService";
+import { createTask, getTasks } from "~/services/taskService";
 import VCreateTaskDialog from "./components/dialogs/VCreateTaskDialog.vue";
 import VTaskList from "./components/VTaskList.vue";
-import { createTask, getTasks } from "~/services/taskService";
 import type { Task, UserTask } from "./types/task";
-import {createReport} from "~/services/reportService";
 
 useHead({
   title: "TimeCell",
@@ -74,6 +74,7 @@ const setCurrentTime = () => {
 };
 
 const telegramId = ref<number | null>(null);
+const telegramUsername = ref<string | null>(null);
 
 onMounted(async () => {
   setCurrentTime();
@@ -86,10 +87,11 @@ onMounted(async () => {
   telegram.enableClosingConfirmation();
 
   telegramId.value = telegram.getUserId();
+  telegramUsername.value = telegram.getUsername()
 
   window.addEventListener("mouseup", handlePointerUp);
 
-  responseTasks.value = await getTasks(telegramId.value);
+  responseTasks.value = await getTasks(telegramUsername.value);
 });
 
 onBeforeUnmount(() => {
@@ -260,7 +262,7 @@ const addRow = () => {
 const createTaskHandler = async (task: UserTask) => {
   await createTask(task);
 
-  responseTasks.value = await getTasks(telegramId.value as number);
+  responseTasks.value = await getTasks(telegramUsername.value as string);
 
   isCreateTaskDialogVisible.value = false;
 };

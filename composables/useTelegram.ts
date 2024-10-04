@@ -9,6 +9,10 @@ export const useTelegram = () => {
 
         enableClosingConfirmation: () => {
             return telegram.WebApp.enableClosingConfirmation();
+        },
+
+        getUsername: () => {
+            return telegram.WebApp.initDataUnsafe.user?.username as string;
         }
     }
 }
