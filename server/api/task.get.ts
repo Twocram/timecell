@@ -1,5 +1,4 @@
 import { Client } from "@notionhq/client";
-import { users } from "~/mock";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
@@ -8,11 +7,9 @@ export default defineEventHandler(async (event) => {
 
   const authorizationHeader = headers["authorization"];
 
-  const telegramUsername = authorizationHeader?.replace("Bearer ", "");
+  const telegramId = authorizationHeader?.replace("Bearer ", "");
 
   const apiKey = config.apiKey;
-
-  const currentUser = users[telegramUsername as keyof typeof users];
 
   const notion = new Client({ auth: apiKey });
 
@@ -20,6 +17,12 @@ export default defineEventHandler(async (event) => {
     database_id: process.env.NOTION_DATABASE_ID as string,
     filter: {
       and: [
+        {
+          property: "telegram_id",
+          rich_text: {
+            equals: telegramId as string,
+          },
+        },
         {
           or: [
             {
@@ -52,44 +55,28 @@ export default defineEventHandler(async (event) => {
   }[] = [];
 
   for (const page of databaseList.results) {
-    // @ts-ignore
-    const persons = page.properties["Person"].people;
+    result.push({
+      id: page.id,
+      // @ts-ignore
+      name: page.properties["Name"].title[0].plain_text,
+      // @ts-ignore
 
-    const personNames = [];
+      time: page.properties["Time"].rich_text[0].plain_text,
+      // @ts-ignore
 
-    for (const person of persons) {
-      if (person.object === "user") {
-        const personDetails = await notion.users.retrieve({
-          user_id: person.id,
-        });
-        personNames.push(personDetails.name);
-      }
-    }
+      summary: page.properties["Summary"].rich_text[0].plain_text,
+      // @ts-ignore
 
-    if (personNames.length > 0 && personNames.includes(currentUser)) {
-      result.push({
-        id: page.id,
-        // @ts-ignore
-        name: page.properties["Name"].title[0].plain_text,
-        // @ts-ignore
+      color: page.properties["Color"].rich_text[0].plain_text,
 
-        time: page.properties["Time"].rich_text[0].plain_text,
-        // @ts-ignore
+      // @ts-ignore
+      pickedTime: page.properties["Picked Time"].rich_text[0].plain_text,
 
-        summary: page.properties["Summary"].rich_text[0].plain_text,
-        // @ts-ignore
+      // @ts-ignore
+      telegramId: page.properties["telegram_id"].rich_text[0].plain_text,
 
-        color: page.properties["Color"].rich_text[0].plain_text,
-
-        // @ts-ignore
-        pickedTime: page.properties["Picked Time"].rich_text[0].plain_text,
-
-        // @ts-ignore
-        telegramId: page.properties["telegram_id"].rich_text[0].plain_text,
-        
-        link: `https://www.notion.so/${page.id.replace(/-/g, '')}`
-      });
-    }
+      link: `https://www.notion.so/${page.id.replace(/-/g, "")}`,
+    });
   }
 
   return result;

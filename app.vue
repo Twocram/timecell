@@ -101,7 +101,7 @@ onMounted(async () => {
 
   window.addEventListener("mouseup", handlePointerUp);
 
-  responseTasks.value = await getTasks(telegramUsername.value);
+  responseTasks.value = await getTasks(telegramId.value as number);
 
   isLoading.value = false
 });
@@ -275,7 +275,7 @@ const addRow = () => {
 const createTaskHandler = async (task: UserTask) => {
   await createTask(task);
 
-  responseTasks.value = await getTasks(telegramUsername.value as string);
+  responseTasks.value = await getTasks(telegramId.value as number);
 
   isCreateTaskDialogVisible.value = false;
 };
