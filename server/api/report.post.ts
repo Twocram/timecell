@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     const chat_id = config.groupChatId
 
     const message = tasks.map((task) => {
-        return `- <a href="${task.link}">${task.name}</a> \n ${task.summary}\n\n`
+        return `— <a href="${task.link}">${task.name}</a> \n ${task.summary}\n\n`
     }).join('')
 
     await bot.api.sendMessage(chat_id, message, {

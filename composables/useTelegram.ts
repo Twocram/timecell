@@ -13,6 +13,10 @@ export const useTelegram = () => {
 
         getUsername: () => {
             return telegram.WebApp.initDataUnsafe.user?.username as string;
+        },
+        
+        expandApp: () => {
+            return telegram.WebApp.expand();
         }
     }
 }

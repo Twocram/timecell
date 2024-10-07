@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { createReport } from "~/services/reportService";
 import { createTask, getTasks } from "~/services/taskService";
 import VCreateTaskDialog from "./components/dialogs/VCreateTaskDialog.vue";
+import VLoader from "./components/ui/VLoader.vue";
 import VTaskList from "./components/VTaskList.vue";
 import type { Task, UserTask } from "./types/task";
 
@@ -44,6 +45,9 @@ const rows = ref<string[]>([
   "18",
   "19",
 ]);
+
+const isLoading = ref<boolean>(false);
+
 const columns = ref<string[]>(["00", "10", "20", "30", "40", "50"]);
 
 const tasks = ref<UserTask[]>([]);
@@ -80,6 +84,7 @@ const telegramId = ref<number | null>(null);
 const telegramUsername = ref<string | null>(null);
 
 onMounted(async () => {
+  isLoading.value = true;
   setCurrentTime();
 
   interval = setInterval(() => {
@@ -89,12 +94,16 @@ onMounted(async () => {
   const telegram = useTelegram();
   telegram.enableClosingConfirmation();
 
+  telegram.expandApp();
+
   telegramId.value = telegram.getUserId();
   telegramUsername.value = telegram.getUsername()
 
   window.addEventListener("mouseup", handlePointerUp);
 
   responseTasks.value = await getTasks(telegramUsername.value);
+
+  isLoading.value = false
 });
 
 onBeforeUnmount(() => {
@@ -156,8 +165,9 @@ const handleTouchMove = (event: TouchEvent) => {
   event.preventDefault();
   const touch = event.touches[0];
   const element = document.elementFromPoint(touch.clientX, touch.clientY);
-  if (element && element.classList.contains("blocks")) {
-    handlePointerEnter((element as HTMLElement).dataset.tip as string);
+  if (element && element.classList.contains("block")) {
+    const block = (element as HTMLElement).dataset.tip as string;
+    handlePointerEnter(block);
   }
 };
 
@@ -311,7 +321,7 @@ updateActiveBlocks();
     @close="closeTaskDialog"
     @close-without-save="closeTaskDialogWithoutSave"
   />
-  <div class="main-container">
+  <div v-if="!isLoading" class="main-container">
     <div class="container" @touchend="handleTouchEnd">
       <div class="minutes-wrapper">
         <div class="minutes" v-for="column in columns" :key="column">
@@ -321,7 +331,7 @@ updateActiveBlocks();
 
       <div
         class="hours-wrapper"
-        :style="{ gridTemplateRows: `repeat(${rows.length}, 28px)` }"
+        :style="{ gridTemplateRows: `repeat(${rows.length}, 38px)` }"
       >
         <div class="hours" v-for="(row, index) in rows" :key="index">
           {{ row }}
@@ -330,7 +340,7 @@ updateActiveBlocks();
 
       <div
         class="blocks-wrapper"
-        :style="{ gridTemplateColumns: `repeat(${columns.length}, 28px)` }"
+        :style="{ gridTemplateColumns: `repeat(${columns.length}, 42px)` }"
       >
         <div
           v-for="block in blocksCount"
@@ -351,11 +361,15 @@ updateActiveBlocks();
         ></div>
       </div>
     </div>
-    <button class="row-btn" @click="addRow">Add row</button>
-    <button class="row-btn" style="margin-top: 18px" @click="createReportHandler" v-if="responseTasks.length">Send Report</button>
+    <button class="row-btn" @click="addRow">Add work-hour</button>
 
     <VTaskList v-if="responseTasks.length" :tasks="responseTasks" />
+
+    <button class="row-btn" style="margin-top: 18px" @click="createReportHandler" v-if="responseTasks.length">SHARE SUMMARY</button>
+
   </div>
+
+  <VLoader v-else />
 </template>
 
 <style scoped>
@@ -363,6 +377,7 @@ updateActiveBlocks();
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-bottom: 20px;
 }
 
 .container {
@@ -432,8 +447,8 @@ updateActiveBlocks();
 
 .row-btn {
   margin-top: 30px;
-  width: 200px;
-  height: 40px;
+  width: 310px;
+  height: 42px;
   background: none;
   border: 1px solid grey;
   border-radius: 4px;
