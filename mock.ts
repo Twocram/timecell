@@ -1,6 +1,19 @@
-export const users: { [key: string]: string} = {
-    "v_tilte": "Artem Maslov",
-    "dima_takoy": "Dmitry Vakhnenko",
-    "ae_69": "Anna Egorova",
-    "Wampussik": "Vladimir Rotov"
-}
+export const users: Record<string, string> = {
+  v_tilte: "Artem Maslov",
+  dima_takoy: "Dmitry Vakhnenko",
+  ae_69: "Anna Egorova",
+  Wampussik: "Vladimir Rotov",
+  myshlyaeva: "Yulia Myshlyaeva",
+  gddmg: "Elina Bolshenkova",
+  IrinaLemzyakova: "Irina Lemzyakova",
+  alekseydsgn: "Aleksey Timofeev",
+  caxaaaaaaaap: "Egor",
+  den59k: "Денис Хохряков",
+  helen_filch: "Elena Filchugova",
+  Yana7666: "Yana Oleinikova",
+  Vitka_Nitka: "Vita Bykova",
+  bssktrs: "Alisa Belykh",
+  maripouser: "Maria Polyanskaya",
+  baglaev_a: "Alexander Baglaev",
+  IronOne: "Temirlan Alikhan",
+};
