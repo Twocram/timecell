@@ -16,6 +16,7 @@ export type Task = {
   color: string;
   pickedTime: string;
   telegramId: string;
+  link: string;
 };
 
 export type ComboboxOption = {

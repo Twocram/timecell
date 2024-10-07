@@ -1,5 +1,5 @@
 import { Bot } from "grammy";
-import {Task} from "~/types/task";
+import { Task } from "~/types/task";
 
 export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
@@ -12,10 +12,12 @@ export default defineEventHandler(async (event) => {
     const chat_id = config.groupChatId
 
     const message = tasks.map((task) => {
-        return `- ${task.name} \n ${task.summary}\n\n`
+        return `- <a href="${task.link}">${task.name}</a> \n ${task.summary}\n\n`
     }).join('')
 
-    await bot.api.sendMessage(chat_id, message)
+    await bot.api.sendMessage(chat_id, message, {
+        parse_mode: 'HTML'
+    })
 
     return {
         ok: true,

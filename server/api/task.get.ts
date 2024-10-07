@@ -48,6 +48,7 @@ export default defineEventHandler(async (event) => {
     color: string;
     pickedTime: string[];
     telegramId: string;
+    link: string;
   }[] = [];
 
   for (const page of databaseList.results) {
@@ -85,6 +86,8 @@ export default defineEventHandler(async (event) => {
 
         // @ts-ignore
         telegramId: page.properties["telegram_id"].rich_text[0].plain_text,
+        
+        link: `https://www.notion.so/${page.id.replace(/-/g, '')}`
       });
     }
   }

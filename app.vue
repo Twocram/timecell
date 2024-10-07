@@ -58,20 +58,23 @@ const setCurrentTime = () => {
   const time = new Date();
 
   let hours = time.getHours();
+  let roundedMinutes = Math.round(time.getMinutes() / 10) * 10;
 
-  const minutes = () => {
-    if (Math.round(time.getMinutes() / 10) * 10 === 0) {
-      return "00";
-    } else if (Math.round(time.getMinutes() / 10) * 10 === 60) {
-      hours += 1;
-      return "00";
-    } else {
-      return Math.round(time.getMinutes() / 10) * 10;
-    }
-  };
+  if (roundedMinutes === 60) {
+    roundedMinutes = 0;
+    hours += 1;
+  }
 
-  currentTime.value = `${hours}:${minutes()}`;
+  if (hours === 24) {
+    hours = 0;
+  }
+
+  const formattedHours = hours.toString().padStart(2, '0');
+  const formattedMinutes = roundedMinutes.toString().padStart(2, '0');
+
+  currentTime.value = `${formattedHours}:${formattedMinutes}`;
 };
+
 
 const telegramId = ref<number | null>(null);
 const telegramUsername = ref<string | null>(null);
