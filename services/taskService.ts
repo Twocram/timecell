@@ -29,6 +29,7 @@ export async function createTask(task: UserTask) {
         color: task.color,
         pickedTime: task.pickedTime,
         telegramId: task.telegramId,
+        minutes: task.minutes,
       }),
     });
   } catch (error) {

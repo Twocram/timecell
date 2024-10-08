@@ -14,6 +14,8 @@ const telegramId = ref<number | null>(null)
 
 const summaryText = ref<string>('')
 
+const minutes = ref<number>(0)
+
 const isLoading = ref<boolean>(false)
 
 const handleKeydown = (event: KeyboardEvent) => {
@@ -22,11 +24,23 @@ const handleKeydown = (event: KeyboardEvent) => {
     }
 }
 
+function getTotalMinutesDifference(timeArray: string[]) {
+  const [hoursStart, minutesStart] = timeArray[0].split(':').map(Number);
+  const [hoursEnd, minutesEnd] = timeArray[timeArray.length - 1].split(':').map(Number);
+
+  const totalMinutesStart = hoursStart * 60 + minutesStart;
+  const totalMinutesEnd = hoursEnd * 60 + minutesEnd;
+
+  return totalMinutesEnd - totalMinutesStart;
+}
+
+
 onMounted(() => {
     const telegram = useTelegram()
     telegramId.value = telegram.getUserId()
     document.body.classList.add('overflow')
     document.addEventListener('keydown', handleKeydown)
+    minutes.value = getTotalMinutesDifference(Array.from(new Set(props.pickedTime)))
 })
 
 const selectedTime = computed<string>(() => {
@@ -68,7 +82,8 @@ const createHandler = (): void => {
         color: color.value,
         option: optionsModel.value,
         pickedTime: props.pickedTime,
-        telegramId: telegramId.value || 0
+        telegramId: telegramId.value || 0,
+        minutes: minutes.value
     }
 
     emits('create', output)

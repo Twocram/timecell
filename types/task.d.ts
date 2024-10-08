@@ -6,6 +6,7 @@ export type UserTask = {
   option: string;
   pickedTime: string[];
   telegramId: number,
+  minutes: number,
 };
 
 export type Task = {
