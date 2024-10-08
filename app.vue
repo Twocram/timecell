@@ -180,21 +180,24 @@ const selectBlocksInRange = (start: string, end: string) => {
   const startCoords = getBlockCoordinates(start);
   const endCoords = getBlockCoordinates(end);
 
-  const startIndex = rows.value.indexOf(startCoords.row);
-  const endIndex = rows.value.indexOf(endCoords.row);
+  const startRowIndex = rows.value.indexOf(startCoords.row);
+  const endRowIndex = rows.value.indexOf(endCoords.row);
 
-  if (startIndex !== endIndex) {
+  if (startRowIndex !== endRowIndex) {
     return;
   }
 
-  const rowIndex = startIndex;
+  const rowIndex = startRowIndex;
   const startColIndex = columns.value.indexOf(startCoords.col);
   const endColIndex = columns.value.indexOf(endCoords.col);
+
   const minCol = Math.min(startColIndex, endColIndex);
   const maxCol = Math.max(startColIndex, endColIndex);
 
-  for (let j = minCol; j <= maxCol; j++) {
-    activeBlocks.value.set(`${rows.value[rowIndex]}:${columns.value[j]}`, "");
+  activeBlocks.value.clear();
+
+  for (let col = minCol; col <= maxCol; col++) {
+    activeBlocks.value.set(`${rows.value[rowIndex]}:${columns.value[col]}`, "");
   }
 };
 
@@ -233,10 +236,13 @@ const handleMouseUp = () => {
     const [row, col] = parseBlock(selectedBlocks.value[0]);
     selectedBlocks.value.push(getNextBlock(row, col));
   } else {
+    let [_, firstCol] = parseBlock(
+      selectedBlocks.value[0]
+    )
     let [lastRow, lastCol] = parseBlock(
       selectedBlocks.value[selectedBlocks.value.length - 1]
     );
-    if (lastCol > 40) {
+    if (firstCol === 0 && lastCol > 40) {
       lastCol = 0;
       lastRow += 1;
 
