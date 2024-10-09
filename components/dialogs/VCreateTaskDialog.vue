@@ -18,6 +18,10 @@ const minutes = ref<number>(0)
 
 const isLoading = ref<boolean>(false)
 
+const startDate = ref<string>('')
+
+const endDate = ref<string>('')
+
 const handleKeydown = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
         emits('closeWithoutSave')
@@ -34,6 +38,13 @@ function getTotalMinutesDifference(timeArray: string[]) {
   return totalMinutesEnd - totalMinutesStart;
 }
 
+function convertTimeToISODate(time: string) {
+  const [hours, minutes] = time.split(':').map(Number);
+  const date = new Date();
+  date.setHours(hours);
+  date.setMinutes(minutes);
+  return date.toISOString();
+}
 
 onMounted(() => {
     const telegram = useTelegram()
@@ -41,6 +52,10 @@ onMounted(() => {
     document.body.classList.add('overflow')
     document.addEventListener('keydown', handleKeydown)
     minutes.value = getTotalMinutesDifference(Array.from(new Set(props.pickedTime)))
+
+    startDate.value = convertTimeToISODate(props.pickedTime[0])
+    endDate.value = convertTimeToISODate(props.pickedTime[props.pickedTime.length - 1])
+
 })
 
 const selectedTime = computed<string>(() => {
@@ -83,7 +98,9 @@ const createHandler = (): void => {
         option: optionsModel.value,
         pickedTime: props.pickedTime,
         telegramId: telegramId.value || 0,
-        minutes: minutes.value
+        minutes: minutes.value,
+        startTime: startDate.value,
+        endTime: endDate.value
     }
 
     emits('create', output)

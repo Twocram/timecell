@@ -1,7 +1,7 @@
 import { Client } from "@notionhq/client";
 
 export default defineEventHandler(async (event) => {
-  const { title, time, summary, color, pickedTime, telegramId, minutes } =
+  const { title, time, summary, color, pickedTime, telegramId, minutes, startTime, endTime } =
     (await readBody(event)) as {
       title: string;
       time: string;
@@ -10,6 +10,8 @@ export default defineEventHandler(async (event) => {
       pickedTime: string[];
       telegramId: number;
       minutes: number;
+      startTime: string;
+      endTime: string;
     };
 
   const config = useRuntimeConfig();
@@ -47,6 +49,13 @@ export default defineEventHandler(async (event) => {
             },
           },
         ],
+      },
+      Duration: {
+        type: "date",
+        date: {
+          "start": startTime,
+          "end": endTime
+        }
       },
       Time: {
         type: "rich_text",

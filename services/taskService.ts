@@ -30,6 +30,8 @@ export async function createTask(task: UserTask) {
         pickedTime: task.pickedTime,
         telegramId: task.telegramId,
         minutes: task.minutes,
+        startTime: task.startTime,
+        endTime: task.endTime,
       }),
     });
   } catch (error) {
